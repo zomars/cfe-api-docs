@@ -1,0 +1,62 @@
+# CFE API
+
+> API self-serve para descargar recibos de luz de CFE (Comisión Federal de Electricidad, México) en JSON estructurado. Sin login, sin scraping manual: el servicio se encarga de descargar el XML público (CFDI) del portal de CFE y devolver los datos parseados.
+
+Cubre tarifas residenciales (1, 1A–1F, DAC), comerciales y de mediana/alta tensión (GDMTH, GDMTO, etc.). Los datos incluyen consumo en kWh, demanda en kW, factor de potencia, lecturas de medidor, historial de hasta 24 meses, conceptos de facturación, esquema de generación distribuida (NETMET) y banco de energía solar cuando aplica.
+
+## Cómo se usa
+
+1. El cliente se registra desde el landing con su correo y paga 100 MXN en Stripe Checkout.
+2. Recibe una API key de la forma `cfe_<token>` y queda con 20 créditos prepagados.
+3. Cuando los créditos se agotan, el servicio reporta cada consulta como un evento de Stripe Meter, y se factura mensualmente al cierre del periodo.
+
+Errores no se cobran. Las consultas servidas desde caché tampoco se cobran (caché expira al `fecha_corte` del recibo).
+
+## Endpoints
+
+- [POST /api/v1/consulta](https://cfe-api.fly.dev/api/v1/consulta): cuerpo `{"rpu": "<12 dígitos>", "nombre": "<titular>"}`, header `X-API-Key`. Devuelve `{cached, metered, charged_cents, fetched_at, expires_at, data}` donde `data` contiene el recibo parseado.
+- [GET /api/v1/balance](https://cfe-api.fly.dev/api/v1/balance): header `X-API-Key`. Devuelve créditos restantes y estado de billing metered.
+- [POST /signup](https://cfe-api.fly.dev/signup): formulario con `email`. Redirige a Stripe Checkout (suscripción + cargo inicial).
+
+## Autenticación
+
+Header `X-API-Key: cfe_<token>` en todas las llamadas a `/api/v1/*`.
+
+## Errores
+
+Todas las respuestas de error usan la forma `{"error": "<mensaje legible en español>"}`. Status codes:
+
+- `400` datos inválidos (RPU no es 12 dígitos, nombre vacío)
+- `401` API key faltante o inválida
+- `402` sin saldo y sin suscripción metered activa
+- `502` no se pudo descargar el recibo de CFE (RPU/nombre no coinciden, o el portal está caído)
+
+## Caché
+
+Cada (api_key, RPU) sólo se cobra una vez por periodo. Las llamadas siguientes para el mismo par key+RPU regresan `cached: true, charged_cents: 0` hasta el `fecha_corte` del recibo.
+
+## Modelo de datos
+
+El campo `data` siempre incluye:
+
+- `rpu`, `nombre`, `direccion`, `rfc`
+- `tarifa` (e.g. `"1F"`, `"DAC"`, `"GDMTO"`), `uso` (`"Doméstico"` etc.), `tipo_consumo` (`"BAJO"`/`"INTERMEDIO"`/`"EXCEDENTE"`), `esquema` (`"NETMET"` si tiene paneles solares, vacío si no)
+- `consumo_kwh`, `demanda_kw`, `factor_potencia`, `dias_periodo`
+- `lectura_actual`, `lectura_anterior`, `lectura_diff`, `num_medidor`
+- `carga_contratada_kw`, `carga_conectada_kw`, `energia_banco_kwh`
+- `subtotal`, `iva`, `total`, `dap`, `subsidio_gub`, `energia_real_sin_subsidio`
+- Fechas en ISO 8601: `fecha` (timestamp), `periodo_desde`, `periodo_hasta`, `fecha_limite`, `fecha_corte`
+- `historial[]` con hasta 24 meses (mensuales o bimestrales según la tarifa): cada entrada lleva `mes`, `año`, `consumo_kwh`, `periodo_desde`, `periodo_hasta`, `facturado`, `pagado`, `pendiente`, `tipo_factura`, y `bimonthly: true` si aplica
+- `conceptos[]` con descripciones y montos de cada línea de la factura
+- `annual_kwh` calculado a partir del historial
+
+## Recursos
+
+- [Landing y registro](https://cfe-api.fly.dev/)
+
+## Casos de uso comunes
+
+- Cotizadores de paneles solares que necesitan consumo histórico anual
+- Apps de finanzas personales que importan recibos de servicios
+- Análisis de eficiencia energética para empresas con múltiples sucursales
+- Validación automática de identidad por dirección de servicio
