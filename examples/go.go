@@ -38,4 +38,9 @@ func main() {
 	}
 	data := result["data"].(map[string]any)
 	fmt.Printf("Tarifa: %v  Anual: %v kWh\n", data["tarifa"], data["annual_kwh"])
+	if hilos, ok := data["hilos"]; ok && hilos != nil {
+		fmt.Printf("Hilos: %v\n", hilos)
+	} else {
+		fmt.Println("Hilos: no disponible")
+	}
 }

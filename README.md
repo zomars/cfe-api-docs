@@ -14,6 +14,7 @@ Le pasas el **RPU** (12 dígitos del servicio) y el **nombre del titular**, y te
 - Lecturas del medidor, demanda, factor de potencia
 - Tarifa, uso (Doméstico, Comercial...), tipo de consumo (BÁSICO/INTERMEDIO/EXCEDENTE)
 - Esquema de generación distribuida (`NETMET` para usuarios con paneles solares) y banco de energía
+- Hilos del servicio cuando CFE los incluye en el recibo
 - Conceptos de facturación, subsidios, DAP
 - Fechas de corte, límite y periodo en **ISO 8601**
 
@@ -63,6 +64,7 @@ Respuesta (resumida):
     "tarifa": "1F",
     "uso": "Doméstico",
     "esquema": "NETMET",
+    "hilos": "3F-4H",
     "consumo_kwh": 879,
     "annual_kwh": 18027,
     "fecha_corte": "2026-03-31",
@@ -79,6 +81,8 @@ Respuesta (resumida):
   }
 }
 ```
+
+`data.hilos` puede venir como string cuando CFE incluye el dato, o como `null` cuando no aparece en el recibo. Este campo es adicional y no cambia la estructura existente de la respuesta.
 
 ### `GET /api/v1/balance`
 

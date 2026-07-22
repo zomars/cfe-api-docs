@@ -24,5 +24,6 @@ async function balance() {
   const result = await consulta("123456789012", "JUAN PEREZ");
   const { data } = result;
   console.log(`Tarifa: ${data.tarifa}  Anual: ${data.annual_kwh} kWh`);
+  console.log(`Hilos: ${data.hilos ?? "no disponible"}`);
   console.log(`Cobrado: ${(result.charged_cents / 100).toFixed(2)} MXN  Cache: ${result.cached}`);
 })();

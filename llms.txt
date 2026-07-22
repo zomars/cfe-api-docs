@@ -40,7 +40,7 @@ Cada (api_key, RPU) sólo se cobra una vez por periodo. Las llamadas siguientes 
 El campo `data` siempre incluye:
 
 - `rpu`, `nombre`, `direccion`, `rfc`
-- `tarifa` (e.g. `"1F"`, `"DAC"`, `"GDMTO"`), `uso` (`"Doméstico"` etc.), `tipo_consumo` (`"BAJO"`/`"INTERMEDIO"`/`"EXCEDENTE"`), `esquema` (`"NETMET"` si tiene paneles solares, vacío si no)
+- `tarifa` (e.g. `"1F"`, `"DAC"`, `"GDMTO"`), `uso` (`"Doméstico"` etc.), `tipo_consumo` (`"BAJO"`/`"INTERMEDIO"`/`"EXCEDENTE"`), `esquema` (`"NETMET"` si tiene paneles solares, vacío si no), `hilos` (string o `null` cuando CFE no lo incluye)
 - `consumo_kwh`, `demanda_kw`, `factor_potencia`, `dias_periodo`
 - `lectura_actual`, `lectura_anterior`, `lectura_diff`, `num_medidor`
 - `carga_contratada_kw`, `carga_conectada_kw`, `energia_banco_kwh`

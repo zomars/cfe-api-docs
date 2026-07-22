@@ -30,4 +30,5 @@ if __name__ == "__main__":
     result = consulta("123456789012", "JUAN PEREZ")
     data = result["data"]
     print(f"Tarifa: {data['tarifa']}  Anual: {data['annual_kwh']} kWh")
+    print(f"Hilos: {data.get('hilos') or 'no disponible'}")
     print(f"Cobrado: {result['charged_cents']/100:.2f} MXN  Cache: {result['cached']}")
