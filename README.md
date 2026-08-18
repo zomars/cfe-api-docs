@@ -15,6 +15,7 @@ Le pasas el **RPU** (12 dígitos del servicio) y el **nombre del titular**, y te
 - Tarifa, uso (Doméstico, Comercial...), tipo de consumo (BÁSICO/INTERMEDIO/EXCEDENTE)
 - Esquema de generación distribuida (`NETMET` para usuarios con paneles solares) y banco de energía
 - Hilos del servicio cuando CFE los incluye en el recibo
+- Desglose Base / Intermedia / Punta (consumo y demanda) en tarifas horarias como GDMTH
 - Conceptos de facturación, subsidios, DAP
 - Fechas de corte, límite y periodo en **ISO 8601**
 
@@ -83,6 +84,30 @@ Respuesta (resumida):
 ```
 
 `data.hilos` puede venir como string cuando CFE incluye el dato, o como `null` cuando no aparece en el recibo. Este campo es adicional y no cambia la estructura existente de la respuesta.
+
+#### Desglose horario (tarifas GDMTH y similares)
+
+En tarifas horarias, `data` incluye además `tarifa_reg` (nombre regulado — estos recibos traen `tarifa: "HM"`, el código legado, y `tarifa_reg: "GDMTH"`) y el objeto `desglose` con consumo y demanda por periodo:
+
+```json
+{
+  "tarifa": "HM",
+  "tarifa_reg": "GDMTH",
+  "consumo_kwh": 24685,
+  "demanda_kw": 139,
+  "desglose": {
+    "base":       {"consumo_kwh": 2690,  "demanda_kw": 68},
+    "intermedia": {"consumo_kwh": 21472, "demanda_kw": 139},
+    "punta":      {"consumo_kwh": 523,   "demanda_kw": 14}
+  },
+  "historial": [
+    {"mes": "JUL", "año": "2025", "consumo_kwh": 20312, "demanda_kw": 120,
+     "desglose": {"base": {"demanda_kw": 74}, "intermedia": {"demanda_kw": 120}, "punta": {"demanda_kw": 11}}}
+  ]
+}
+```
+
+La suma del consumo de los periodos es igual a `consumo_kwh` y el máximo de las demandas es igual a `demanda_kw`. En el `historial` el desglose incluye sólo demanda (el recibo de CFE no desglosa el consumo histórico por periodo). En tarifas no horarias `desglose` es `null` y el historial no cambia.
 
 ### `GET /api/v1/balance`
 

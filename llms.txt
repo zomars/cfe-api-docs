@@ -40,13 +40,14 @@ Cada (api_key, RPU) sólo se cobra una vez por periodo. Las llamadas siguientes 
 El campo `data` siempre incluye:
 
 - `rpu`, `nombre`, `direccion`, `rfc`
-- `tarifa` (e.g. `"1F"`, `"DAC"`, `"GDMTO"`), `uso` (`"Doméstico"` etc.), `tipo_consumo` (`"BAJO"`/`"INTERMEDIO"`/`"EXCEDENTE"`), `esquema` (`"NETMET"` si tiene paneles solares, vacío si no), `hilos` (string o `null` cuando CFE no lo incluye)
+- `tarifa` (e.g. `"1F"`, `"DAC"`, `"GDMTO"`), `tarifa_reg` (nombre regulado vigente; e.g. los recibos GDMTH traen `tarifa: "HM"` — código legado — y `tarifa_reg: "GDMTH"`), `uso` (`"Doméstico"` etc.), `tipo_consumo` (`"BAJO"`/`"INTERMEDIO"`/`"EXCEDENTE"`), `esquema` (`"NETMET"` si tiene paneles solares, vacío si no), `hilos` (string o `null` cuando CFE no lo incluye)
 - `consumo_kwh`, `demanda_kw`, `factor_potencia`, `dias_periodo`
+- `desglose` (sólo tarifas horarias como GDMTH; `null` en las demás): consumo y demanda por periodo horario, e.g. `{"base": {"consumo_kwh": 2690, "demanda_kw": 68}, "intermedia": {...}, "punta": {...}}`. La suma de `consumo_kwh` de los periodos es igual al `consumo_kwh` total y el máximo de `demanda_kw` es igual a `demanda_kw`
 - `lectura_actual`, `lectura_anterior`, `lectura_diff`, `num_medidor`
 - `carga_contratada_kw`, `carga_conectada_kw`, `energia_banco_kwh`
 - `subtotal`, `iva`, `total`, `dap`, `subsidio_gub`, `energia_real_sin_subsidio`
 - Fechas en ISO 8601: `fecha` (timestamp), `periodo_desde`, `periodo_hasta`, `fecha_limite`, `fecha_corte`
-- `historial[]` con hasta 24 meses (mensuales o bimestrales según la tarifa): cada entrada lleva `mes`, `año`, `consumo_kwh`, `periodo_desde`, `periodo_hasta`, `facturado`, `pagado`, `pendiente`, `tipo_factura`, y `bimonthly: true` si aplica
+- `historial[]` con hasta 24 meses (mensuales o bimestrales según la tarifa): cada entrada lleva `mes`, `año`, `consumo_kwh`, `periodo_desde`, `periodo_hasta`, `facturado`, `pagado`, `pendiente`, `tipo_factura`, y `bimonthly: true` si aplica. En tarifas horarias cada mes incluye además `desglose` con la demanda por periodo, e.g. `{"base": {"demanda_kw": 74}, "intermedia": {"demanda_kw": 120}, "punta": {"demanda_kw": 11}}` (el recibo de CFE no desglosa el consumo kWh histórico por periodo, sólo la demanda)
 - `conceptos[]` con descripciones y montos de cada línea de la factura
 - `annual_kwh` calculado a partir del historial
 
