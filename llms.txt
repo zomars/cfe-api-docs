@@ -14,7 +14,7 @@ Errores no se cobran. Las consultas servidas desde caché tampoco se cobran (cac
 
 ## Endpoints
 
-- [POST /api/v1/consulta](https://cfe-api.fly.dev/api/v1/consulta): cuerpo `{"rpu": "<12 dígitos>", "nombre": "<titular>"}`, header `X-API-Key`. Devuelve `{request_id, cached, metered, charged_cents, fetched_at, expires_at, data, xml_url, pdf_url}` donde `data` contiene el recibo parseado. `xml_url`/`pdf_url` son URLs firmadas temporales al CFDI XML y al PDF del recibo. `request_id` identifica la consulta para debugging — inclúyelo al reportar cualquier problema; también puedes mandar tu propio id en el header `X-Request-ID` (alfanumérico, ≤64 chars) y se te regresa en el header y el body.
+- [POST /api/v1/consulta](https://cfe-api.fly.dev/api/v1/consulta): cuerpo `{"rpu": "<12 dígitos>", "nombre": "<titular>"}`, header `X-API-Key`. Devuelve `{request_id, cached, metered, charged_cents, fetched_at, expires_at, data, xml_url, pdf_url}` donde `data` contiene el recibo parseado. `xml_url` es una URL firmada temporal al CFDI XML; `pdf_url` es una URL firmada temporal al PDF oficial del recibo de CFE (el CFDI con Cadena Original, Folio Fiscal y sello del SAT), se procura en segundo plano al momento de la consulta y nunca es `null`. `request_id` identifica la consulta para debugging — inclúyelo al reportar cualquier problema; también puedes mandar tu propio id en el header `X-Request-ID` (alfanumérico, ≤64 chars) y se te regresa en el header y el body.
 - [GET /api/v1/balance](https://cfe-api.fly.dev/api/v1/balance): header `X-API-Key`. Devuelve créditos restantes y estado de billing metered.
 - [POST /signup](https://cfe-api.fly.dev/signup): formulario con `email`. Redirige a Stripe Checkout (suscripción + cargo inicial).
 
@@ -26,10 +26,12 @@ Header `X-API-Key: cfe_<token>` en todas las llamadas a `/api/v1/*`.
 
 Todas las respuestas de error usan la forma `{"error": "<mensaje legible en español>"}`. Status codes:
 
-- `400` datos inválidos (RPU no es 12 dígitos, nombre vacío)
+- `400` datos inválidos (RPU no es 12 dígitos, nombre vacío o inválido como el literal "null")
 - `401` API key faltante o inválida
 - `402` sin saldo y sin suscripción metered activa
-- `502` no se pudo descargar el recibo de CFE (RPU/nombre no coinciden, o el portal está caído)
+- `404` no se encontró el recibo — RPU/nombre no coinciden, o el portal de CFE no lo entregó (falla rápido, sin colgarse)
+- `502` el proveedor de recibos falló tras reintentos (p. ej. el portal de CFE caído)
+- `504` el recibo no estuvo listo antes del timeout
 
 ## Caché
 
