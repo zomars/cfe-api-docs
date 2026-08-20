@@ -27,7 +27,7 @@ Header `X-API-Key: cfe_<token>` en todas las llamadas a `/api/v1/*`.
 
 Todas las respuestas de error usan la forma `{"error": "<mensaje legible en español>"}`. Status codes:
 
-- `400` datos inválidos (RPU no es 12 dígitos, nombre vacío o inválido como el literal "null")
+- `400` datos inválidos (RPU no es 12 dígitos, nombre vacío o inválido como el literal "null", `periodo` sin formato `YYYY-MM`)
 - `401` API key faltante o inválida
 - `402` sin saldo y sin suscripción metered activa
 - `404` no se encontró el recibo — RPU/nombre no coinciden, el portal de CFE no lo entregó (falla rápido, sin colgarse), o el `periodo` solicitado ya no está disponible en el portal (el mensaje lista los periodos disponibles)
