@@ -12,6 +12,15 @@ curl -X POST https://cfe-api.fly.dev/api/v1/consulta \
   -d "{\"rpu\":\"$RPU\",\"nombre\":\"$NOMBRE\"}"
 # La respuesta incluye data.hilos cuando CFE lo publica; si no, data.hilos es null.
 
+# Consulta de un periodo anterior (recibo completo de ese mes, incl. desglose
+# horario en tarifas como GDMTH). 1 crédito por periodo; repetirlo es gratis.
+curl -X POST https://cfe-api.fly.dev/api/v1/consulta \
+  -H "X-API-Key: $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d "{\"rpu\":\"$RPU\",\"nombre\":\"$NOMBRE\",\"periodo\":\"2026-06\"}"
+# El portal de CFE sólo expone los recibos recientes (~4-5 meses en tarifas
+# mensuales); un periodo fuera de esa ventana regresa 404 con los disponibles.
+
 # Saldo
 curl https://cfe-api.fly.dev/api/v1/balance \
   -H "X-API-Key: $API_KEY"

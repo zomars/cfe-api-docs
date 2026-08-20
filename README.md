@@ -51,6 +51,8 @@ Content-Type: application/json
 {"rpu": "123456789012", "nombre": "JUAN PEREZ"}
 ```
 
+Opcionalmente acepta `"periodo": "YYYY-MM"` para pedir el recibo completo de un periodo anterior (incluye su `desglose` horario en tarifas como GDMTH). Se cobra 1 crédito por (api_key, RPU, periodo) y repetir un periodo ya consultado es gratis para siempre; el portal de CFE sólo expone los recibos recientes (~4–5 meses en tarifas mensuales), y un periodo fuera de esa ventana regresa `404` con la lista de disponibles, sin cobrar.
+
 Respuesta (resumida):
 
 ```json

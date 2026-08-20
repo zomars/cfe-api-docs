@@ -15,6 +15,7 @@ Errores no se cobran. Las consultas servidas desde caché tampoco se cobran (cac
 ## Endpoints
 
 - [POST /api/v1/consulta](https://cfe-api.fly.dev/api/v1/consulta): cuerpo `{"rpu": "<12 dígitos>", "nombre": "<titular>"}`, header `X-API-Key`. Devuelve `{request_id, cached, metered, charged_cents, fetched_at, expires_at, data, xml_url, pdf_url}` donde `data` contiene el recibo parseado. `xml_url` es una URL firmada temporal al CFDI XML; `pdf_url` es una URL firmada temporal al PDF oficial del recibo de CFE (el CFDI con Cadena Original, Folio Fiscal y sello del SAT), se procura en segundo plano al momento de la consulta y nunca es `null`. `request_id` identifica la consulta para debugging — inclúyelo al reportar cualquier problema; también puedes mandar tu propio id en el header `X-Request-ID` (alfanumérico, ≤64 chars) y se te regresa en el header y el body.
+- **Periodos anteriores**: el mismo endpoint acepta opcionalmente `"periodo": "YYYY-MM"` (e.g. `"2026-06"`) para pedir el recibo de un periodo de facturación anterior. La respuesta trae el recibo **completo** de ese mes — incluyendo, en tarifas horarias como GDMTH, su `desglose` de consumo y demanda por periodo horario — más el campo `periodo` como eco. Requiere `nombre` y funciona sólo con el proveedor por defecto (no con `provider: "lisa"`). El portal de CFE únicamente expone los recibos más recientes (típicamente ~4–5 meses hacia atrás en tarifas mensuales, ~1–2 años en bimestrales); un periodo fuera de esa ventana regresa `404` con la lista de periodos disponibles, sin cobrar. Cada periodo consultado cuenta como una consulta normal (1 crédito); repetir un periodo ya consultado con la misma key es gratis para siempre, porque un recibo pasado nunca cambia.
 - [GET /api/v1/balance](https://cfe-api.fly.dev/api/v1/balance): header `X-API-Key`. Devuelve créditos restantes y estado de billing metered.
 - [POST /signup](https://cfe-api.fly.dev/signup): formulario con `email`. Redirige a Stripe Checkout (suscripción + cargo inicial).
 
@@ -29,13 +30,15 @@ Todas las respuestas de error usan la forma `{"error": "<mensaje legible en espa
 - `400` datos inválidos (RPU no es 12 dígitos, nombre vacío o inválido como el literal "null")
 - `401` API key faltante o inválida
 - `402` sin saldo y sin suscripción metered activa
-- `404` no se encontró el recibo — RPU/nombre no coinciden, o el portal de CFE no lo entregó (falla rápido, sin colgarse)
+- `404` no se encontró el recibo — RPU/nombre no coinciden, el portal de CFE no lo entregó (falla rápido, sin colgarse), o el `periodo` solicitado ya no está disponible en el portal (el mensaje lista los periodos disponibles)
 - `502` el proveedor de recibos falló tras reintentos (p. ej. el portal de CFE caído)
 - `504` el recibo no estuvo listo antes del timeout
 
 ## Caché
 
 Cada (api_key, RPU) sólo se cobra una vez por periodo. Las llamadas siguientes para el mismo par key+RPU regresan `cached: true, charged_cents: 0` hasta el `fecha_corte` del recibo.
+
+Las consultas con `periodo` se cobran una vez por (api_key, RPU, periodo). Como un recibo pasado es inmutable, ese acceso no expira: repetir el mismo periodo con la misma key siempre regresa `cached: true, charged_cents: 0`.
 
 ## Modelo de datos
 
@@ -49,7 +52,7 @@ El campo `data` siempre incluye:
 - `carga_contratada_kw`, `carga_conectada_kw`, `energia_banco_kwh`
 - `subtotal`, `iva`, `total`, `dap`, `subsidio_gub`, `energia_real_sin_subsidio`
 - Fechas en ISO 8601: `fecha` (timestamp), `periodo_desde`, `periodo_hasta`, `fecha_limite`, `fecha_corte`
-- `historial[]` con hasta 24 meses (mensuales o bimestrales según la tarifa): cada entrada lleva `mes`, `año`, `consumo_kwh`, `periodo_desde`, `periodo_hasta`, `facturado`, `pagado`, `pendiente`, `tipo_factura`, y `bimonthly: true` si aplica. En tarifas horarias cada mes incluye además `desglose` con la demanda por periodo, e.g. `{"base": {"demanda_kw": 74}, "intermedia": {"demanda_kw": 120}, "punta": {"demanda_kw": 11}}` (el recibo de CFE no desglosa el consumo kWh histórico por periodo, sólo la demanda)
+- `historial[]` con hasta 24 meses (mensuales o bimestrales según la tarifa): cada entrada lleva `mes`, `año`, `consumo_kwh`, `periodo_desde`, `periodo_hasta`, `facturado`, `pagado`, `pendiente`, `tipo_factura`, y `bimonthly: true` si aplica. En tarifas horarias cada mes incluye además `desglose` con la demanda por periodo, e.g. `{"base": {"demanda_kw": 74}, "intermedia": {"demanda_kw": 120}, "punta": {"demanda_kw": 11}}` (el recibo de CFE no desglosa el consumo kWh histórico por periodo, sólo la demanda; para el desglose completo de un mes reciente, consulta ese mes con `"periodo": "YYYY-MM"`)
 - `conceptos[]` con descripciones y montos de cada línea de la factura
 - `annual_kwh` calculado a partir del historial
 
