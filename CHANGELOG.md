@@ -5,6 +5,9 @@ Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 ## 2026-08-28
 
 ### Cambios de comportamiento
+- **El proveedor `lisa` fue retirado.** GMX (el portal de CFE) es ahora el único proveedor; `provider: "auto"` equivale a `gmx`. Enviar `provider: "lisa"` (en el body o en el header `X-CFE-Provider`) responde `400` con un mensaje explícito de retiro.
+- **`nombre` es siempre requerido en `POST /api/v1/consulta`.** Antes, una consulta sin `nombre` se atendía por el proveedor de respaldo (mucho más lento); ahora responde `400` pidiendo el nombre del titular.
+- Se retiró el estado **`504`** de la tabla de errores: sólo lo producía el proveedor retirado.
 - **La caché ya no sobrevive a la emisión del siguiente recibo.** Antes, un recibo consultado después de su `fecha_corte` se cacheaba 30 días fijos, lo que podía servir un recibo viejo hasta ~3 semanas después de que CFE emitiera el siguiente (notorio en tarifas mensuales como GDMTH). Ahora la expiración se limita a la fecha estimada de emisión del siguiente recibo (fin del siguiente ciclo de facturación + unos días de margen); si el siguiente recibo ya debería existir pero el portal aún no lo publica, la caché expira en 1 día para reintentarlo pronto. El campo `expires_at` de la respuesta refleja este límite.
 
 ## 2026-08-20
