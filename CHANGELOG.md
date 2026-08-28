@@ -2,6 +2,11 @@
 
 Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
+## 2026-08-28
+
+### Cambios de comportamiento
+- **La caché ya no sobrevive a la emisión del siguiente recibo.** Antes, un recibo consultado después de su `fecha_corte` se cacheaba 30 días fijos, lo que podía servir un recibo viejo hasta ~3 semanas después de que CFE emitiera el siguiente (notorio en tarifas mensuales como GDMTH). Ahora la expiración se limita a la fecha estimada de emisión del siguiente recibo (fin del siguiente ciclo de facturación + unos días de margen); si el siguiente recibo ya debería existir pero el portal aún no lo publica, la caché expira en 1 día para reintentarlo pronto. El campo `expires_at` de la respuesta refleja este límite.
+
 ## 2026-08-20
 
 ### Nuevo

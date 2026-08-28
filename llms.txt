@@ -10,7 +10,7 @@ Cubre tarifas residenciales (1, 1A–1F, DAC), comerciales y de mediana/alta ten
 2. Recibe una API key de la forma `cfe_<token>` y queda con 20 créditos prepagados.
 3. Cuando los créditos se agotan, el servicio reporta cada consulta como un evento de Stripe Meter, y se factura mensualmente al cierre del periodo.
 
-Errores no se cobran. Las consultas servidas desde caché tampoco se cobran (caché expira al `fecha_corte` del recibo).
+Errores no se cobran. Las consultas servidas desde caché tampoco se cobran (la caché expira al `fecha_corte` del recibo, o cuando se estima la emisión del siguiente recibo si el corte ya pasó — así una consulta nueva siempre refleja el recibo más reciente).
 
 ## Endpoints
 
@@ -36,7 +36,7 @@ Todas las respuestas de error usan la forma `{"error": "<mensaje legible en espa
 
 ## Caché
 
-Cada (api_key, RPU) sólo se cobra una vez por periodo. Las llamadas siguientes para el mismo par key+RPU regresan `cached: true, charged_cents: 0` hasta el `fecha_corte` del recibo.
+Cada (api_key, RPU) sólo se cobra una vez por periodo. Las llamadas siguientes para el mismo par key+RPU regresan `cached: true, charged_cents: 0` hasta que expira la caché: al `fecha_corte` del recibo o, si el corte ya pasó al momento de consultar, cuando se estima que CFE emite el siguiente recibo (fin del siguiente ciclo de facturación + unos días). La caché nunca sobrevive a la emisión del siguiente recibo, así que no se sirven recibos viejos cuando ya existe uno más nuevo.
 
 Las consultas con `periodo` se cobran una vez por (api_key, RPU, periodo). Como un recibo pasado es inmutable, ese acceso no expira: repetir el mismo periodo con la misma key siempre regresa `cached: true, charged_cents: 0`.
 
