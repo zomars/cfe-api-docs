@@ -2,6 +2,11 @@
 
 Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
+## 2026-09-02
+
+### Cambios de comportamiento
+- **Nuevo estado `503` cuando el portal de CFE está fuera de servicio.** Cuando el portal responde con su propio aviso "Por el momento el servicio no se encuentra disponible", la API ahora responde **`503`** con el header `Retry-After` (segundos), en lugar del `404` genérico de antes. El `404` queda reservado para datos que realmente no coinciden (RPU/nombre) o periodos no disponibles: si recibes `503`, tus datos pueden estar bien — solo reintenta más tarde.
+
 ## 2026-08-28
 
 ### Cambios de comportamiento

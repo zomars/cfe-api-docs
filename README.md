@@ -148,9 +148,9 @@ Todas las respuestas de error usan la forma `{"error": "<mensaje en español>"}`
 | `400` | RPU malformado, o nombre vacío / inválido (p. ej. el literal `"null"`) |
 | `401` | API key faltante o inválida |
 | `402` | Sin saldo y sin suscripción metered activa |
-| `404` | No se encontró el recibo — el RPU y el nombre del titular no coinciden, o el portal de CFE no lo entregó (falla rápido, sin colgarse) |
-| `502` | El proveedor de recibos falló tras reintentos (p. ej. el portal de CFE caído) |
-| `504` | El recibo no estuvo listo antes del timeout |
+| `404` | No se encontró el recibo — el RPU y el nombre del titular no coinciden (falla rápido, sin colgarse), o el `periodo` pedido ya no está disponible |
+| `502` | El proveedor de recibos falló tras reintentos (error inesperado) |
+| `503` | El portal de CFE está temporalmente fuera de servicio — no es un problema con tus datos; reintenta después del tiempo del header `Retry-After` (segundos) |
 
 ## Cambios
 
