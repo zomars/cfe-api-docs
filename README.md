@@ -150,7 +150,7 @@ Todas las respuestas de error usan la forma `{"error": "<mensaje en español>"}`
 | `402` | Sin saldo y sin suscripción metered activa |
 | `404` | No se encontró el recibo — el RPU y el nombre del titular no coinciden (falla rápido, sin colgarse), o el `periodo` pedido ya no está disponible |
 | `502` | El proveedor de recibos falló tras reintentos (error inesperado) |
-| `503` | El portal de CFE está temporalmente fuera de servicio — no es un problema con tus datos; reintenta después del tiempo del header `Retry-After` (segundos) |
+| `503` | El portal de CFE está temporalmente fuera de servicio o inaccesible — no es un problema con tus datos; reintenta después del tiempo del header `Retry-After` (segundos). Tras fallos consecutivos la API responde `503` de inmediato hasta que expira esa ventana |
 
 ## Cambios
 
