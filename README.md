@@ -130,7 +130,7 @@ La suma del consumo de los periodos es igual a `consumo_kwh` y el máximo de las
 
 ### `GET /api/v1/balance`
 
-Devuelve créditos restantes y estado de billing metered.
+Devuelve créditos restantes, estado de billing metered y `billing_portal`: la URL del [portal de facturación de Stripe](https://billing.stripe.com/p/login/14AeVfcp14jd3l8fgu8IU00), donde puedes ver tus facturas, descargar recibos de pago y actualizar tu tarjeta (login con el correo de registro; Stripe envía un código de acceso). En keys sin billing metered el campo es `null`.
 
 ## Ejemplos por lenguaje
 

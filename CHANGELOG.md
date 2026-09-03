@@ -4,6 +4,9 @@ Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
 ## 2026-09-02
 
+### Nuevo
+- **Portal de facturación self-serve.** Facturas mensuales, recibos de pago y método de pago se administran ahora en el [portal de facturación de Stripe](https://billing.stripe.com/p/login/14AeVfcp14jd3l8fgu8IU00) (login con el correo de registro; Stripe envía un código de acceso). `GET /api/v1/balance` incluye la URL en el nuevo campo `billing_portal` (`null` en keys sin billing metered).
+
 ### Cambios de comportamiento
 - **Nuevo estado `503` cuando el portal de CFE está fuera de servicio.** Cuando el portal responde con su propio aviso "Por el momento el servicio no se encuentra disponible", la API ahora responde **`503`** con el header `Retry-After` (segundos), en lugar del `404` genérico de antes. El `404` queda reservado para datos que realmente no coinciden (RPU/nombre) o periodos no disponibles: si recibes `503`, tus datos pueden estar bien — solo reintenta más tarde.
 - **Pausa automática ante fallos consecutivos del portal.** Tras fallos consecutivos del portal de CFE, la API deja de intentar contra el portal durante una ventana (minutos) y responde `503` de inmediato; `Retry-After` indica cuánto falta. Reintentar antes de esa ventana no acelera nada — el primer intento después de `Retry-After` es el que vuelve a probar el portal.

@@ -9,6 +9,7 @@ Cubre tarifas residenciales (1, 1A–1F, DAC), comerciales y de mediana/alta ten
 1. El cliente se registra desde el landing con su correo y paga 100 MXN en Stripe Checkout.
 2. Recibe una API key de la forma `cfe_<token>` y queda con 20 créditos prepagados.
 3. Cuando los créditos se agotan, el servicio reporta cada consulta como un evento de Stripe Meter, y se factura mensualmente al cierre del periodo.
+4. Facturas, recibos de pago y método de pago se consultan y administran en el [portal de facturación](https://billing.stripe.com/p/login/14AeVfcp14jd3l8fgu8IU00) (login con el correo de registro; Stripe envía un código de acceso).
 
 Errores no se cobran. Las consultas servidas desde caché tampoco se cobran (la caché expira al `fecha_corte` del recibo, o cuando se estima la emisión del siguiente recibo si el corte ya pasó — así una consulta nueva siempre refleja el recibo más reciente).
 
@@ -16,7 +17,7 @@ Errores no se cobran. Las consultas servidas desde caché tampoco se cobran (la 
 
 - [POST /api/v1/consulta](https://cfe-api.fly.dev/api/v1/consulta): cuerpo `{"rpu": "<12 dígitos>", "nombre": "<titular>"}`, header `X-API-Key`. Devuelve `{request_id, cached, metered, charged_cents, fetched_at, expires_at, data, xml_url, pdf_url}` donde `data` contiene el recibo parseado. `xml_url` es una URL firmada temporal al CFDI XML; `pdf_url` es una URL firmada temporal al PDF oficial del recibo de CFE (el CFDI con Cadena Original, Folio Fiscal y sello del SAT), se procura en segundo plano al momento de la consulta y nunca es `null`. `request_id` identifica la consulta para debugging — inclúyelo al reportar cualquier problema; también puedes mandar tu propio id en el header `X-Request-ID` (alfanumérico, ≤64 chars) y se te regresa en el header y el body.
 - **Periodos anteriores**: el mismo endpoint acepta opcionalmente `"periodo": "YYYY-MM"` (e.g. `"2026-06"`) para pedir el recibo de un periodo de facturación anterior. La respuesta trae el recibo **completo** de ese mes — incluyendo, en tarifas horarias como GDMTH, su `desglose` de consumo y demanda por periodo horario — más el campo `periodo` como eco. Requiere `nombre`. El portal de CFE únicamente expone los recibos más recientes (típicamente ~4–5 meses hacia atrás en tarifas mensuales, ~1–2 años en bimestrales); un periodo fuera de esa ventana regresa `404` con la lista de periodos disponibles, sin cobrar. Cada periodo consultado cuenta como una consulta normal (1 crédito); repetir un periodo ya consultado con la misma key es gratis para siempre, porque un recibo pasado nunca cambia.
-- [GET /api/v1/balance](https://cfe-api.fly.dev/api/v1/balance): header `X-API-Key`. Devuelve créditos restantes y estado de billing metered.
+- [GET /api/v1/balance](https://cfe-api.fly.dev/api/v1/balance): header `X-API-Key`. Devuelve créditos restantes, estado de billing metered y `billing_portal` — URL del portal de facturación de Stripe donde el cliente consulta sus facturas, actualiza su tarjeta y descarga recibos de pago (login con el correo de registro).
 - [POST /signup](https://cfe-api.fly.dev/signup): formulario con `email`. Redirige a Stripe Checkout (suscripción + cargo inicial).
 
 ## Autenticación
