@@ -145,6 +145,7 @@ Todas las respuestas de error usan la forma `{"error": "<mensaje en español>"}`
 
 | Status | Cuándo |
 |---|---|
+| `202` | Solo en `GET pdf_url`: el PDF oficial aún se está generando. Reintenta tras el `Retry-After` (cuerpo `{"status": "pending"}`) |
 | `400` | RPU malformado, o nombre vacío / inválido (p. ej. el literal `"null"`) |
 | `401` | API key faltante o inválida |
 | `402` | Sin saldo y sin suscripción metered activa |

@@ -2,6 +2,11 @@
 
 Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
+## 2026-09-04
+
+### Cambios de comportamiento
+- **`pdf_url` sirve solo el PDF oficial de CFE (CFDI), nunca un facsímil.** Antes, si la generación del PDF oficial fallaba, el servicio servía un render sintético visualmente equivalente. Ahora `pdf_url` entrega **únicamente** el CFDI oficial (con Cadena Original, Folio Fiscal y sello del SAT). Mientras se está generando, un `GET` a `pdf_url` responde **`202`** con header `Retry-After` (segundos) y cuerpo `{"status": "pending"}` — haz polling hasta el `200` con el `application/pdf` oficial. `pdf_url` sigue sin ser nunca `null`.
+
 ## 2026-09-02
 
 ### Nuevo
