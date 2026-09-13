@@ -11,8 +11,18 @@ import (
 
 const api = "https://cfe-api.fly.dev"
 
-func consulta(rpu, nombre string) (map[string]any, error) {
-	body, _ := json.Marshal(map[string]string{"rpu": rpu, "nombre": nombre})
+// provider and totalAPagar are optional (pass ""). total_a_pagar (monto actual a
+// pagar, sin decimales) es requerido cuando el proveedor efectivo es "micfe":
+// CFE valida rpu + nombre (razón social) + total.
+func consulta(rpu, nombre, provider, totalAPagar string) (map[string]any, error) {
+	payload := map[string]string{"rpu": rpu, "nombre": nombre}
+	if provider != "" {
+		payload["provider"] = provider
+	}
+	if totalAPagar != "" {
+		payload["total_a_pagar"] = totalAPagar
+	}
+	body, _ := json.Marshal(payload)
 	req, _ := http.NewRequest("POST", api+"/api/v1/consulta", bytes.NewReader(body))
 	req.Header.Set("X-API-Key", os.Getenv("CFE_API_KEY"))
 	req.Header.Set("Content-Type", "application/json")
@@ -32,7 +42,7 @@ func consulta(rpu, nombre string) (map[string]any, error) {
 }
 
 func main() {
-	result, err := consulta("123456789012", "JUAN PEREZ")
+	result, err := consulta("123456789012", "JUAN PEREZ", "", "")
 	if err != nil {
 		panic(err)
 	}

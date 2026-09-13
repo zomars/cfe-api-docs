@@ -3,11 +3,16 @@
 const API = "https://cfe-api.fly.dev";
 const API_KEY = process.env.CFE_API_KEY;
 
-async function consulta(rpu, nombre) {
+async function consulta(rpu, nombre, { provider, totalAPagar } = {}) {
+  const body = { rpu, nombre };
+  if (provider) body.provider = provider;
+  // total_a_pagar (monto actual a pagar, sin decimales) es requerido cuando el
+  // proveedor efectivo es "micfe": CFE valida rpu + nombre (razón social) + total.
+  if (totalAPagar) body.total_a_pagar = totalAPagar;
   const r = await fetch(`${API}/api/v1/consulta`, {
     method: "POST",
     headers: { "X-API-Key": API_KEY, "Content-Type": "application/json" },
-    body: JSON.stringify({ rpu, nombre }),
+    body: JSON.stringify(body),
   });
   if (!r.ok) throw new Error(`${r.status} ${(await r.json()).error}`);
   return r.json();

@@ -9,11 +9,19 @@ API = "https://cfe-api.fly.dev"
 API_KEY = os.environ["CFE_API_KEY"]
 
 
-def consulta(rpu: str, nombre: str) -> dict:
+def consulta(rpu: str, nombre: str, provider: str | None = None,
+             total_a_pagar: str | None = None) -> dict:
+    body = {"rpu": rpu, "nombre": nombre}
+    if provider:
+        body["provider"] = provider
+    # total_a_pagar (monto actual a pagar, sin decimales) es requerido cuando el
+    # proveedor efectivo es "micfe": CFE valida rpu + nombre (razón social) + total.
+    if total_a_pagar:
+        body["total_a_pagar"] = total_a_pagar
     r = requests.post(
         f"{API}/api/v1/consulta",
         headers={"X-API-Key": API_KEY},
-        json={"rpu": rpu, "nombre": nombre},
+        json=body,
         timeout=120,
     )
     r.raise_for_status()

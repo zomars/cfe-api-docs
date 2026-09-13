@@ -2,6 +2,20 @@
 
 Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
+## 2026-09-12
+
+### Nuevo
+- **Proveedor `micfe` (enrolamiento en MiCFE/MiEspacio) — la vía soportada de aquí en adelante.** CFE retiró el portal público anónimo que usaba el proveedor `gmx` (búsqueda por RPU + nombre). El nuevo proveedor `micfe` no hace una búsqueda anónima: **enrola el RPU como un "servicio"** en una cuenta de CFE y luego descarga su recibo. Se activa con `"provider": "micfe"` en el cuerpo o el header `X-CFE-Provider: micfe` en `POST /api/v1/consulta`. El proveedor por defecto sigue siendo `gmx`; `micfe` es opt-in.
+- **Nuevo campo `total_a_pagar` en `POST /api/v1/consulta`.** String con el monto actual a pagar del recibo, **sin decimales**. Es **requerido cuando el proveedor efectivo es `micfe`**: CFE lo valida junto con el `rpu` y el `nombre` (que debe coincidir con la **razón social** registrada, más estricta que el nombre impreso). Con el proveedor por defecto no es necesario.
+
+### Cambios de comportamiento
+- **El proveedor `micfe` entrega solo el recibo más reciente.** No acepta `"periodo": "YYYY-MM"`; una consulta con `periodo` por `micfe` responde `400`.
+- **Semántica de errores del enrolamiento `micfe`:**
+  - `400` — falta `total_a_pagar`, o CFE rechaza el enrolamiento porque el `nombre` (razón social) o el `total_a_pagar` no coinciden con su registro (el mensaje trae el texto de CFE).
+  - `401` — no hay credenciales de CFE válidas para atender la consulta (falta la credencial o CFE rechazó el login).
+  - `409` (nuevo) — la cuenta de CFE requiere un cambio de contraseña obligatorio antes de poder usarse; actualízala en el portal de CFE (MiEspacio) y reintenta.
+  - `503` — MiEspacio bloqueó temporalmente el acceso; reintenta tras el `Retry-After` (segundos).
+
 ## 2026-09-04
 
 ### Cambios de comportamiento

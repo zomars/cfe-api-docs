@@ -53,6 +53,17 @@ Content-Type: application/json
 
 Opcionalmente acepta `"periodo": "YYYY-MM"` para pedir el recibo completo de un periodo anterior (incluye su `desglose` horario en tarifas como GDMTH). Se cobra 1 crédito por (api_key, RPU, periodo) y repetir un periodo ya consultado es gratis para siempre; el portal de CFE sólo expone los recibos recientes (~4–5 meses en tarifas mensuales), y un periodo fuera de esa ventana regresa `404` con la lista de disponibles, sin cobrar.
 
+**Proveedor de recibos (MiCFE).** El endpoint acepta opcionalmente el proveedor con el campo `"provider"` en el cuerpo o el header `X-CFE-Provider` (valores: `gmx`, `micfe`, `auto`). El proveedor **`micfe`** es la vía soportada de aquí en adelante: en lugar de una búsqueda anónima por RPU + nombre, **enrola el RPU como un "servicio"** en una cuenta de CFE (MiEspacio) y luego descarga su recibo. Enrolar exige un campo adicional **`total_a_pagar`** (string, el monto actual a pagar del recibo, sin decimales) — **requerido cuando el proveedor efectivo es `micfe`** — que CFE valida junto con el `rpu` y el `nombre` (que debe coincidir con la **razón social** registrada por CFE, más estricta que el nombre impreso). El proveedor `micfe` entrega solo el recibo más reciente: no acepta `periodo`.
+
+```http
+POST /api/v1/consulta
+X-API-Key: cfe_xxxxxxxx
+X-CFE-Provider: micfe
+Content-Type: application/json
+
+{"rpu": "123456789012", "nombre": "JUAN PEREZ", "total_a_pagar": "1234"}
+```
+
 Respuesta (resumida):
 
 ```json
@@ -146,12 +157,13 @@ Todas las respuestas de error usan la forma `{"error": "<mensaje en español>"}`
 | Status | Cuándo |
 |---|---|
 | `202` | Solo en `GET pdf_url`: el PDF oficial aún se está generando. Reintenta tras el `Retry-After` (cuerpo `{"status": "pending"}`) |
-| `400` | RPU malformado, o nombre vacío / inválido (p. ej. el literal `"null"`) |
-| `401` | API key faltante o inválida |
+| `400` | RPU malformado, o nombre vacío / inválido (p. ej. el literal `"null"`). Con `micfe`: falta `total_a_pagar`, o CFE rechaza el enrolamiento porque el nombre (razón social) o el total no coinciden con su registro (el mensaje trae el texto de CFE) |
+| `401` | API key faltante o inválida; o, con `micfe`, no hay credenciales de CFE válidas para atender la consulta |
 | `402` | Sin saldo y sin suscripción metered activa |
 | `404` | No se encontró el recibo — el RPU y el nombre del titular no coinciden (falla rápido, sin colgarse), o el `periodo` pedido ya no está disponible |
+| `409` | (proveedor `micfe`) La cuenta de CFE requiere un cambio de contraseña obligatorio; actualízala en el portal de CFE (MiEspacio) y reintenta |
 | `502` | El proveedor de recibos falló tras reintentos (error inesperado) |
-| `503` | El portal de CFE está temporalmente fuera de servicio o inaccesible — no es un problema con tus datos; reintenta después del tiempo del header `Retry-After` (segundos). Tras fallos consecutivos la API responde `503` de inmediato hasta que expira esa ventana |
+| `503` | El portal de CFE está temporalmente fuera de servicio o inaccesible (incluye el bloqueo temporal de MiEspacio con `micfe`) — no es un problema con tus datos; reintenta después del tiempo del header `Retry-After` (segundos). Tras fallos consecutivos la API responde `503` de inmediato hasta que expira esa ventana |
 
 ## Cambios
 
