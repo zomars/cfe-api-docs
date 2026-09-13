@@ -2,6 +2,11 @@
 
 Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
+## 2026-09-13
+
+### Nuevo
+- **Onboarding de credenciales CFE.** Nuevos endpoints `POST` / `GET` / `DELETE /api/v1/cfe-credentials` (autenticados con tu API key) para registrar tu propia cuenta de CFE (MiEspacio). Al registrarla, `/consulta` usa tu cuenta —donde tus RPU ya están enrolados— en lugar de la cuenta compartida. La contraseña nunca se devuelve en las respuestas.
+
 ## 2026-09-12
 
 ### Nuevo
