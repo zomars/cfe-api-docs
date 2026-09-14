@@ -152,18 +152,18 @@ Devuelve créditos restantes, estado de billing metered y `billing_portal`: la U
 
 ## Errores
 
-Todas las respuestas de error usan la forma `{"error": "<mensaje en español>"}`.
+Todas las respuestas de error usan la forma `{"error": "<mensaje en español>", "code": "<código estable>"}`. El `code` (snake_case) es el contrato para máquinas: haz branching sobre él, no sobre el mensaje. La lista completa de códigos está en [llms.txt](llms.txt); trata un código no reconocido como un error genérico de su status.
 
-| Status | Cuándo |
-|---|---|
-| `202` | Solo en `GET pdf_url`: el PDF oficial aún se está generando. Reintenta tras el `Retry-After` (cuerpo `{"status": "pending"}`) |
-| `400` | RPU malformado, o nombre vacío / inválido (p. ej. el literal `"null"`). Con `micfe`: falta `total_a_pagar`, o CFE rechaza el enrolamiento porque el nombre (razón social) o el total no coinciden con su registro (el mensaje trae el texto de CFE) |
-| `401` | API key faltante o inválida; o, con `micfe`, no hay credenciales de CFE válidas para atender la consulta |
-| `402` | Sin saldo y sin suscripción metered activa |
-| `404` | No se encontró el recibo — el RPU y el nombre del titular no coinciden (falla rápido, sin colgarse), o el `periodo` pedido ya no está disponible |
-| `409` | (proveedor `micfe`) La cuenta de CFE requiere un cambio de contraseña obligatorio; actualízala en el portal de CFE (MiEspacio) y reintenta |
-| `502` | El proveedor de recibos falló tras reintentos (error inesperado) |
-| `503` | El portal de CFE está temporalmente fuera de servicio o inaccesible (incluye el bloqueo temporal de MiEspacio con `micfe`) — no es un problema con tus datos; reintenta después del tiempo del header `Retry-After` (segundos). Tras fallos consecutivos la API responde `503` de inmediato hasta que expira esa ventana |
+| Status | Códigos | Cuándo |
+|---|---|---|
+| `202` | — | Solo en `GET pdf_url`: el PDF oficial aún se está generando. Reintenta tras el `Retry-After` (cuerpo `{"status": "pending"}`) |
+| `400` | `invalid_request`, `total_a_pagar_required`, `name_mismatch`, `total_mismatch`, `enroll_rejected`, `periodo_not_supported` | RPU malformado, o nombre vacío / inválido (p. ej. el literal `"null"`). Con `micfe`: falta `total_a_pagar`, o CFE rechaza el enrolamiento porque el nombre (razón social) o el total no coinciden con su registro (el mensaje trae el texto de CFE) |
+| `401` | `invalid_api_key`, `cfe_credentials` | API key faltante o inválida; o, con `micfe`, no hay credenciales de CFE válidas para atender la consulta |
+| `402` | `no_subscription`, `billing_failed` | Sin saldo y sin suscripción metered activa |
+| `404` | `not_found` | No se encontró el recibo — el RPU y el nombre del titular no coinciden (falla rápido, sin colgarse), o el `periodo` pedido ya no está disponible |
+| `409` | `action_required` | (proveedor `micfe`) La cuenta de CFE requiere un cambio de contraseña obligatorio; actualízala en el portal de CFE (MiEspacio) y reintenta |
+| `502` | `provider_error` | El proveedor de recibos falló tras reintentos (error inesperado) |
+| `503` | `upstream_unavailable` | El portal de CFE está temporalmente fuera de servicio o inaccesible (incluye el bloqueo temporal de MiEspacio con `micfe`) — no es un problema con tus datos; reintenta después del tiempo del header `Retry-After` (segundos). Tras fallos consecutivos la API responde `503` de inmediato hasta que expira esa ventana |
 
 ## Cambios
 

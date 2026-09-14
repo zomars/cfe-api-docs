@@ -32,15 +32,26 @@ Header `X-API-Key: cfe_<token>` en todas las llamadas a `/api/v1/*`.
 
 ## Errores
 
-Todas las respuestas de error usan la forma `{"error": "<mensaje legible en español>"}`. Status codes:
+Todas las respuestas de error usan la forma `{"error": "<mensaje legible en español>", "code": "<código estable>"}`. El `code` es el contrato para máquinas: snake_case, estable, pensado para hacer branching sin parsear el mensaje (el mensaje puede cambiar; el código no). Pueden aparecer códigos nuevos: trata un código no listado como un error genérico de su status code.
 
-- `400` datos inválidos (RPU no es 12 dígitos, nombre vacío o inválido como el literal "null", `periodo` sin formato `YYYY-MM`). Con el proveedor `micfe`: falta `total_a_pagar`, o CFE rechaza el enrolamiento porque el `nombre` (razón social) o el `total_a_pagar` no coinciden con su registro — en ese caso el mensaje trae el texto de CFE
-- `401` API key faltante o inválida; o, con el proveedor `micfe`, no hay credenciales de CFE válidas para atender la consulta (falta la credencial o CFE rechazó el login)
-- `402` sin saldo y sin suscripción metered activa
-- `404` no se encontró el recibo — RPU/nombre no coinciden (falla rápido, sin colgarse), o el `periodo` solicitado ya no está disponible en el portal (el mensaje lista los periodos disponibles)
-- `409` (proveedor `micfe`) la cuenta de CFE requiere un cambio de contraseña obligatorio antes de poder usarse; actualízala en el portal de CFE (MiEspacio) y reintenta
-- `502` el proveedor de recibos falló tras reintentos (error inesperado del lado del scraping)
-- `503` el portal de CFE está temporalmente fuera de servicio o inaccesible (incluye el caso en que MiEspacio bloquea temporalmente el acceso con el proveedor `micfe`); no es un problema con tus datos — reintenta después del tiempo indicado en el header `Retry-After` (segundos). Tras fallos consecutivos del portal, la API responde `503` de inmediato (sin intentar contra el portal) hasta que expira esa ventana, así que respetar `Retry-After` es la vía más rápida a una respuesta exitosa
+Códigos por status:
+
+- `400`:
+  - `invalid_request` — datos inválidos: RPU no es 12 dígitos, nombre vacío o inválido como el literal "null", `periodo` sin formato `YYYY-MM`, o proveedor no soportado
+  - `total_a_pagar_required` — el proveedor efectivo es `micfe` y falta `total_a_pagar`
+  - `name_mismatch` / `total_mismatch` — CFE rechazó el enrolamiento porque el `nombre` (razón social) o el `total_a_pagar` no coinciden con su registro; el mensaje trae el texto de CFE
+  - `enroll_rejected` — CFE rechazó el enrolamiento sin causa clasificable (el mensaje trae el texto de CFE si lo hubo)
+  - `periodo_not_supported` — consulta con `periodo` por `micfe` (solo entrega el recibo más reciente)
+- `401`:
+  - `invalid_api_key` — API key faltante o inválida
+  - `cfe_credentials` — (proveedor `micfe`) no hay credenciales de CFE válidas para atender la consulta (falta la credencial o CFE rechazó el login)
+- `402`:
+  - `no_subscription` — sin saldo y sin suscripción metered activa
+  - `billing_failed` — no fue posible registrar el cobro; reintenta
+- `404` `not_found` — no se encontró el recibo: RPU/nombre no coinciden (falla rápido, sin colgarse), o el `periodo` solicitado ya no está disponible en el portal (el mensaje lista los periodos disponibles)
+- `409` `action_required` — (proveedor `micfe`) la cuenta de CFE requiere un cambio de contraseña obligatorio antes de poder usarse; actualízala en el portal de CFE (MiEspacio) y reintenta
+- `502` `provider_error` — el proveedor de recibos falló tras reintentos (error inesperado del lado del scraping)
+- `503` `upstream_unavailable` — el portal de CFE está temporalmente fuera de servicio o inaccesible (incluye el caso en que MiEspacio bloquea temporalmente el acceso con el proveedor `micfe`); no es un problema con tus datos — reintenta después del tiempo indicado en el header `Retry-After` (segundos). Tras fallos consecutivos del portal, la API responde `503` de inmediato (sin intentar contra el portal) hasta que expira esa ventana, así que respetar `Retry-After` es la vía más rápida a una respuesta exitosa
 
 ## Caché
 
