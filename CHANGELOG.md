@@ -5,6 +5,7 @@ Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 ## 2026-09-14
 
 ### Corregido
+- **`total_a_pagar` ya no es requerido en consultas `micfe` servidas desde caché.** El `400 total_a_pagar_required` ahora solo aplica cuando el recibo (o periodo) pedido no está en caché y hay que ir al portal — que es donde el enrolamiento realmente lo necesita. Un recibo ya cacheado se sirve sin el campo, así que las integraciones anteriores a `micfe` que no lo mandan siguen funcionando sobre RPUs ya consultados.
 - **`pdf_url` ahora entrega el PDF oficial con el proveedor `micfe`.** Antes, con `micfe`, `GET pdf_url` respondía `202` indefinidamente (la obtención del PDF apuntaba al portal anterior, ya retirado). Ahora el CFDI oficial (Cadena Original, Folio Fiscal, sello SAT) se obtiene en la misma sesión que el XML, así que `pdf_url` resuelve a `200` con el `application/pdf` oficial sin necesidad de polling. El contrato no cambia (`pdf_url` nunca es `null`; sigue siendo oficial-only).
 
 ### Nuevo
