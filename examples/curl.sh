@@ -24,12 +24,13 @@ curl -X POST https://cfe-api.fly.dev/api/v1/consulta \
 
 # Consulta de un periodo anterior (recibo completo de ese mes, incl. desglose
 # horario en tarifas como GDMTH). 1 crédito por periodo; repetirlo es gratis.
+# Con micfe incluye total_a_pagar (el enrolamiento puede ocurrir en la llamada).
 curl -X POST https://cfe-api.fly.dev/api/v1/consulta \
   -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
-  -d "{\"rpu\":\"$RPU\",\"nombre\":\"$NOMBRE\",\"periodo\":\"2026-06\"}"
-# El portal de CFE sólo expone los recibos recientes (~4-5 meses en tarifas
-# mensuales); un periodo fuera de esa ventana regresa 404 con los disponibles.
+  -d "{\"rpu\":\"$RPU\",\"nombre\":\"$NOMBRE\",\"provider\":\"micfe\",\"total_a_pagar\":\"$TOTAL_A_PAGAR\",\"periodo\":\"2026-06\"}"
+# El portal lista el historial mensual completo del servicio enrolado
+# (típicamente varios años); un periodo fuera regresa 404 con los disponibles.
 
 # Saldo
 curl https://cfe-api.fly.dev/api/v1/balance \

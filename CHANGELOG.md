@@ -5,6 +5,7 @@ Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 ## 2026-09-14
 
 ### Nuevo
+- **Periodos anteriores con el proveedor `micfe`.** `"periodo": "YYYY-MM"` ahora funciona también por `micfe`: una vez enrolado el servicio, el portal lista su historial mensual completo (típicamente varios años hacia atrás — mucho más profundo que la ventana de ~4–5 meses del proveedor anterior). Igual que antes: la primera consulta descarga y cachea todos los periodos listados pero cobra solo el pedido; un periodo fuera de la lista regresa `404` con los disponibles, sin cobrar. Requiere `total_a_pagar` (el enrolamiento puede ocurrir en la misma llamada). Se retira el código de error `periodo_not_supported` (ese `400` ya no existe).
 - **Campo `code` en todas las respuestas de error.** Cada error incluye ahora un código estable legible por máquinas junto al mensaje: `{"error": "<mensaje en español>", "code": "<snake_case>"}`. El mensaje puede cambiar; el código no — haz branching sobre `code` en lugar de parsear el mensaje. Destacados: los rechazos de enrolamiento `micfe` ahora distinguen `name_mismatch`, `total_mismatch` y `enroll_rejected`; `total_a_pagar_required` señala que faltó ese campo; `invalid_api_key` vs `cfe_credentials` desambiguan los dos casos de `401`. Lista completa por status en [llms.txt](llms.txt). Cambio aditivo: el campo `error` no cambia de forma.
 
 ## 2026-09-13
