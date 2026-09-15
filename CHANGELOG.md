@@ -4,6 +4,9 @@ Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
 ## 2026-09-15
 
+### Corregido
+- **Cobro idempotente bajo consultas concurrentes.** Dos consultas simultáneas del mismo `(key, RPU[, periodo])` — por ejemplo un retry del cliente mientras la primera espera el enrollamiento — ya no producen un doble cobro: la segunda espera el resultado de la primera y se sirve de la caché resultante (un solo cargo, un solo evento de Stripe Meter). Además, cada cobro reporta ahora un `identifier` determinístico (hash de key+RPU+periodo) a Stripe, de modo que un reporte accidental duplicado dedupe en Stripe en lugar de facturar dos veces. No cambia el contrato documentado: un mismo `(key, RPU[, periodo])` sigue cobrándose una sola vez.
+
 ### Cambios de comportamiento
 - **Las API keys nuevas requieren su propia cuenta de CFE (Mi Espacio) desde el inicio.** Las keys creadas a partir del 2026-09-15 no usan la cuenta de respaldo compartida: sin credencial propia registrada, `/consulta` con el proveedor `micfe` responde `401` con código `cfe_credentials` y las instrucciones de registro. Las keys anteriores conservan la cuenta de respaldo durante el periodo de gracia ya anunciado (hasta el 1 de octubre de 2026). Regístrala con `POST /api/v1/cfe-credentials`.
 - **`POST /api/v1/cfe-credentials` ahora valida la credencial con un login real contra CFE antes de guardarla.** Login rechazado → `401` `cfe_credentials`; la cuenta exige cambio de contraseña obligatorio → `409` `cfe_password_change_required` (cámbiala en Mi Espacio y registra la nueva); portal de CFE inaccesible para validar → `503` con header `Retry-After`. Una credencial rechazada no se guarda; el `200 {"status": "stored"}` ahora garantiza que la credencial funcionaba al registrarse.
