@@ -2,6 +2,11 @@
 
 Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
+## 2026-09-19
+
+### Corregido
+- **Los timeouts y otros fallos transitorios del navegador de MiCFE ya no responden `500 internal_error` ni se confunden con credenciales rechazadas.** En `/api/v1/consulta` ahora responden `502 unavailable`; en `POST /api/v1/cfe-credentials`, `502 provider_error`. La consulta no se cobra, la credencial no se guarda y un timeout no abre la pausa automática del portal; reintenta más tarde.
+
 ## 2026-09-15
 
 ### Corregido
