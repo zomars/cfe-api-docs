@@ -105,7 +105,7 @@ Además de `data`, la respuesta incluye:
 
 - **`request_id`** — identificador de la consulta. Inclúyelo al reportar cualquier problema. También puedes mandar el tuyo en el header `X-Request-ID` (alfanumérico, ≤64 chars) y se te regresa en el body y en el header de respuesta.
 - **`xml_url`** — URL firmada temporal al **XML (CFDI)** del recibo.
-- **`pdf_url`** — URL firmada temporal al **PDF oficial del recibo de CFE** (el CFDI con Cadena Original, Folio Fiscal y sello del SAT). Es una URL estable: el archivo se procura en segundo plano al momento de la consulta, así que al abrirla obtienes el documento ya listo. **Nunca es `null`.**
+- **`pdf_url`** — URL firmada temporal al **PDF oficial del recibo de CFE** (el CFDI con Cadena Original, Folio Fiscal y sello del SAT). **Nunca es `null`.** El archivo se procura en segundo plano al momento de la consulta; mientras falta, responde `202` con `Retry-After`, y cada poll posterior puede reactivar el intento. Si el `202` persiste porque MiCFE ya no conserva el servicio enrolado, repite la misma `/consulta` con el `total_a_pagar` vigente: fuerza el reenrolamiento y un intento inmediato y, al ser caché, no vuelve a cobrar.
 
 ```json
 {

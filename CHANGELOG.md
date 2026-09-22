@@ -2,6 +2,11 @@
 
 Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
+## 2026-09-21
+
+### Corregido
+- **`pdf_url` de MiCFE ya no queda sin fulfiller cuando falla la descarga inicial.** La API conserva fuera del URL firmado el contexto autenticado necesario, vincula cada URL a su API key, reintenta el periodo exacto en segundo plano y permite que los polls posteriores al `Retry-After` reactiven el trabajo incluso tras reiniciar el proceso. Si el enrolamiento ya fue rotado, repetir la misma `/consulta` con el `total_a_pagar` vigente lo restablece y fuerza un intento inmediato, sin un segundo cobro. El PDF servido sigue siendo únicamente el CFDI oficial.
+
 ## 2026-09-19
 
 ### Corregido
