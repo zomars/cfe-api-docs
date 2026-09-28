@@ -2,6 +2,18 @@
 
 Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
+## 2026-09-26
+
+### Corregido
+- **Las consultas que van al portal de CFE con la cuenta de respaldo vuelven a funcionar.** Desde el 2026-09-24 CFE exige un código de verificación por correo en cada inicio de sesión de Mi Espacio, y las consultas que no estaban en caché respondían `502 provider_error`. La API ahora completa esa verificación sola. No cambia el contrato y los `502` de esos días no se cobraron.
+
+## 2026-09-25
+
+### Nuevo
+- **`POST /api/v1/solar-diagram`**: genera el diagrama unifilar (SVG) de un sistema fotovoltaico para el trámite de interconexión ante CFE. Acepta dos formas del cuerpo: plana o por inversor. Lo que falta de los 9 puntos que exige la oficina de CFE se dibuja en gris como "por confirmar", y los headers `X-CFE-Checklist`/`X-CFE-Missing` reportan qué tan completo quedó. Es determinístico y se cachea por hash del payload. Gratis por ahora.
+- **`POST /api/v1/solar-plano`**: con el mismo cuerpo más `meta` opcional, devuelve el plano completo en PDF listo para firmar (unifilar, cajetín, croquis de localización, lista de equipo y, solo cuando está completa, la memoria de cálculo, reportada en `X-Memoria`/`X-Memoria-Missing`). `meta` nunca se cachea ni se persiste. Gratis por ahora.
+- Los errores de validación de estos dos endpoints responden `422 invalid_request` y el mensaje nombra el campo que falló.
+
 ## 2026-09-21
 
 ### Corregido
