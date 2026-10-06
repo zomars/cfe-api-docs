@@ -2,6 +2,11 @@
 
 Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
+## 2026-10-05
+
+### Retirado
+- **`POST /api/v1/solar-diagram` y `POST /api/v1/solar-plano` dejan de existir** y responden `404`. El diagrama unifilar, el plano y la memoria de cálculo se generan ahora en app.solayre.mx. Ninguno de los dos endpoints tenía costo, así que no hay créditos que reembolsar.
+
 ## 2026-09-26
 
 ### Corregido
