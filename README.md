@@ -158,11 +158,12 @@ Todas las respuestas de error usan la forma `{"error": "<mensaje en español>", 
 |---|---|---|
 | `202` | — | Solo en `GET pdf_url`: el PDF oficial aún se está generando. Reintenta tras el `Retry-After` (cuerpo `{"status": "pending"}`) |
 | `400` | `invalid_request`, `total_a_pagar_required`, `name_mismatch`, `total_mismatch`, `enroll_rejected` | RPU malformado, o nombre vacío / inválido (p. ej. el literal `"null"`). Con `micfe`: falta `total_a_pagar` y el recibo no está en caché, o CFE rechaza el enrolamiento porque el nombre (razón social) o el total no coinciden con su registro (el mensaje trae el texto de CFE) |
-| `401` | `invalid_api_key`, `cfe_credentials` | API key faltante o inválida; o, con `micfe`, no hay credenciales de CFE válidas para atender la consulta |
+| `401` | `invalid_api_key`, `cfe_credentials` | API key faltante o inválida; o, con `micfe`, la cuenta de CFE del servicio no pudo iniciar sesión (reintenta más tarde) |
 | `402` | `no_subscription`, `billing_failed` | Sin saldo y sin suscripción metered activa |
 | `404` | `not_found` | No se encontró el recibo — el RPU y el nombre del titular no coinciden (falla rápido, sin colgarse), o el `periodo` pedido ya no está disponible |
-| `409` | `action_required`, `cfe_password_change_required` | La cuenta de CFE requiere un cambio de contraseña obligatorio. `/consulta` usa `action_required`; `POST /api/v1/cfe-credentials`, `cfe_password_change_required`. Actualízala en MiEspacio y reintenta. |
-| `502` | `unavailable`, `provider_error` | En `/consulta`, el proveedor no pudo completar la operación por un fallo transitorio (`unavailable`) y la consulta no se cobra. En `POST /api/v1/cfe-credentials`, MiCFE no pudo validar la cuenta por un fallo transitorio no clasificado (`provider_error`) y la credencial no se guarda. Reintenta más tarde. |
+| `409` | `action_required` | CFE exige un cambio de contraseña en la cuenta del servicio; lo resolvemos nosotros, reintenta más tarde. |
+| `410` | `gone` | `POST /api/v1/cfe-credentials` está suspendido: todas las consultas usan las cuentas del servicio. |
+| `502` | `unavailable` | En `/consulta`, el proveedor no pudo completar la operación por un fallo transitorio y la consulta no se cobra. Reintenta más tarde. |
 | `503` | `upstream_unavailable` | El portal de CFE está temporalmente fuera de servicio o inaccesible (incluye el bloqueo temporal de MiEspacio con `micfe`) — no es un problema con tus datos; reintenta después del tiempo del header `Retry-After` (segundos). Tras fallos consecutivos la API responde `503` de inmediato hasta que expira esa ventana |
 
 ## Cambios

@@ -2,6 +2,14 @@
 
 Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
+## 2026-10-10
+
+### Cambiado
+- **Ya no necesitas registrar una cuenta de CFE propia: todas las API keys usan las cuentas del servicio.** Desde el 2026-09-24 CFE pide un código por correo en cada inicio de sesión de Mi Espacio. Con una cuenta propia ese código llega a tu buzón, así que esas consultas fallaban con `502` ([#5](https://github.com/zomars/cfe-api-docs/issues/5)). Ahora `POST /api/v1/cfe-credentials` responde `410 gone`. `GET` y `DELETE` siguen funcionando, y si ya habías registrado una credencial, se conserva pero no se usa. Ninguna key recibe ya `401 cfe_credentials` por no tener una cuenta propia.
+
+### Corregido
+- La documentación decía que cada cuenta de CFE sostiene hasta 10 servicios. Ese límite no existe en CFE y nunca afectó tus consultas.
+
 ## 2026-10-05
 
 ### Retirado
