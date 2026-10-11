@@ -2,6 +2,11 @@
 
 Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
+## 2026-10-11
+
+### Corregido
+- **`"provider": "gmx"` y `"auto"` ya no responden `503 upstream_unavailable`.** Esos valores mandaban la consulta a la búsqueda anónima de CFE (GMX), que CFE retiró el 2026-09-12, y su página de aviso se leía como un bloqueo del portal. Ahora el servidor atiende cualquier valor de `provider` con `micfe`, así que puedes omitir el campo. Si la consulta no está en caché, envía `total_a_pagar`; sin él, la respuesta es `400 total_a_pagar_required`. Los `503` de esos días no se cobraron.
+
 ## 2026-10-10
 
 ### Cambiado
