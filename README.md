@@ -156,7 +156,7 @@ Todas las respuestas de error usan la forma `{"error": "<mensaje en español>", 
 | Status | Códigos | Cuándo |
 |---|---|---|
 | `202` | — | Solo en `GET pdf_url`: el PDF oficial aún se está generando. Reintenta tras el `Retry-After` (cuerpo `{"status": "pending"}`) |
-| `400` | `invalid_request`, `total_a_pagar_required`, `name_mismatch`, `total_mismatch`, `enroll_rejected` | RPU malformado, o nombre vacío / inválido (p. ej. el literal `"null"`). Con `micfe`: falta `total_a_pagar` y el recibo no está en caché, o CFE rechaza el enrolamiento porque el nombre (razón social) o el total no coinciden con su registro (el mensaje trae el texto de CFE) |
+| `400` | `invalid_request`, `total_a_pagar_required`, `name_mismatch`, `total_mismatch`, `rpu_not_found`, `enroll_rejected` | RPU malformado, o nombre vacío / inválido (p. ej. el literal `"null"`). Con `micfe`: falta `total_a_pagar` y el recibo no está en caché, o CFE rechaza el enrolamiento porque el nombre (razón social) o el total no coinciden con su registro, o porque el RPU no existe (el mensaje trae el texto de CFE) |
 | `401` | `invalid_api_key`, `cfe_credentials` | API key faltante o inválida; o, con `micfe`, la cuenta de CFE del servicio no pudo iniciar sesión (reintenta más tarde) |
 | `402` | `no_subscription`, `billing_failed` | Sin saldo y sin suscripción metered activa |
 | `404` | `not_found` | No se encontró el recibo — el RPU y el nombre del titular no coinciden (falla rápido, sin colgarse), o el `periodo` pedido ya no está disponible |

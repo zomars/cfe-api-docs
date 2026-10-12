@@ -36,6 +36,7 @@ Códigos por status:
   - `invalid_request` — datos inválidos: en `/api/v1/consulta`, RPU no es 12 dígitos, nombre vacío o inválido como el literal "null", `periodo` sin formato `YYYY-MM`, o proveedor no soportado
   - `total_a_pagar_required` — el proveedor efectivo es `micfe`, el recibo no está en caché y falta `total_a_pagar`
   - `name_mismatch` / `total_mismatch` — CFE rechazó el enrolamiento porque el `nombre` (razón social) o el `total_a_pagar` no coinciden con su registro; el mensaje trae el texto de CFE
+  - `rpu_not_found` — CFE rechazó el enrolamiento porque el RPU no existe en su registro; verifica el RPU contra el recibo
   - `enroll_rejected` — CFE rechazó el enrolamiento sin causa clasificable (el mensaje trae el texto de CFE si lo hubo)
 - `401`:
   - `invalid_api_key` — API key faltante o inválida
@@ -47,7 +48,7 @@ Códigos por status:
 - `409` `action_required` — en `/consulta` con `micfe`, CFE exige un cambio de contraseña en la cuenta del servicio; lo resolvemos nosotros, reintenta más tarde
 - `410` `gone` — `POST /api/v1/cfe-credentials` está suspendido (ver arriba)
 - `502` `unavailable` — en `/consulta`, el proveedor de recibos no pudo completar la operación por un fallo transitorio no clasificable de MiCFE; no se cobra la consulta y debes reintentar más tarde
-- `503` `upstream_unavailable` — el portal de CFE está temporalmente fuera de servicio o inaccesible (incluye el caso en que MiEspacio bloquea temporalmente el acceso con el proveedor `micfe`); no es un problema con tus datos — reintenta después del tiempo indicado en el header `Retry-After` (segundos). Tras fallos consecutivos del portal, la API responde `503` de inmediato (sin intentar contra el portal) hasta que expira esa ventana, así que respetar `Retry-After` es la vía más rápida a una respuesta exitosa
+- `503` `upstream_unavailable` — el portal de CFE está temporalmente fuera de servicio o inaccesible (incluye el caso en que MiEspacio bloquea temporalmente el acceso con el proveedor `micfe`, y el aviso de CFE "el servicio no se encuentra disponible" al enrolar un RPU; si ese aviso persiste para un mismo RPU tras varios reintentos espaciados, CFE puede tener un trámite en curso sobre ese servicio); no es un problema con tus datos — reintenta después del tiempo indicado en el header `Retry-After` (segundos). Tras fallos consecutivos del portal, la API responde `503` de inmediato (sin intentar contra el portal) hasta que expira esa ventana, así que respetar `Retry-After` es la vía más rápida a una respuesta exitosa
 
 ## Caché
 

@@ -2,6 +2,12 @@
 
 Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
+## 2026-10-12
+
+### Cambiado
+- **Nuevo código `400 rpu_not_found`.** Cuando CFE responde que el RPU no existe, la API devuelve este código en lugar del genérico `enroll_rejected`. El mensaje sigue trayendo el texto de CFE.
+- **El aviso de CFE "el servicio no se encuentra disponible" al enrolar ahora responde `503 upstream_unavailable` con `Retry-After`**, en lugar de `400 enroll_rejected`. Es un estado temporal del portal, así que conviene reintentar más tarde. Ninguno de los dos casos se cobra.
+
 ## 2026-10-11
 
 ### Corregido
