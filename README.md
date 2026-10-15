@@ -164,6 +164,7 @@ Todas las respuestas de error usan la forma `{"error": "<mensaje en español>", 
 | `410` | `gone` | `POST /api/v1/cfe-credentials` está suspendido: todas las consultas usan las cuentas del servicio. |
 | `502` | `unavailable` | En `/consulta`, el proveedor no pudo completar la operación por un fallo transitorio y la consulta no se cobra. Reintenta más tarde. |
 | `503` | `upstream_unavailable` | El portal de CFE está temporalmente fuera de servicio o inaccesible (incluye el bloqueo temporal de MiEspacio con `micfe`) — no es un problema con tus datos; reintenta después del tiempo del header `Retry-After` (segundos). Tras fallos consecutivos la API responde `503` de inmediato hasta que expira esa ventana |
+| `503` | `history_unavailable` | El RPU quedó enrolado, pero CFE no muestra por ahora su historial de recibos ("no se encuentra disponible la información solicitada"); es un estado de ese servicio del lado de CFE. No se cobra; reintenta después del `Retry-After` (3600 s) |
 
 ## Cambios
 

@@ -2,6 +2,14 @@
 
 Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
+## 2026-10-14
+
+### Cambiado
+- **Nuevo código `503 history_unavailable`.** Cuando el RPU queda enrolado pero CFE no muestra su historial de recibos (responde "Por el momento no se encuentra disponible la información solicitada"), la API devuelve este código con `Retry-After: 3600` y el texto de CFE. Antes respondía `404 not_found` con "Periodos disponibles: ninguno", como si el RPU no tuviera recibos. Lo vimos en servicios de Mexicali. No se cobra.
+
+### Corregido
+- Una consulta sin `periodo` que no encuentra ningún recibo ya no dice "El periodo None no está disponible".
+
 ## 2026-10-12
 
 ### Cambiado
