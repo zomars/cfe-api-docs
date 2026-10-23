@@ -37,6 +37,8 @@ Códigos por status:
   - `total_a_pagar_required` — el proveedor efectivo es `micfe`, el recibo no está en caché y falta `total_a_pagar`
   - `name_mismatch` / `total_mismatch` — CFE rechazó el enrolamiento porque el `nombre` (razón social) o el `total_a_pagar` no coinciden con su registro; el mensaje trae el texto de CFE
   - `rpu_not_found` — CFE rechazó el enrolamiento porque el RPU no existe en su registro; verifica el RPU contra el recibo
+  - `service_cancelled` — CFE rechazó el enrolamiento porque el servicio está dado de baja; ese RPU ya no tiene contrato vigente
+  - `total_format` — CFE rechazó el formato de `total_a_pagar`; envíalo como entero sin decimales, sin `$`, comas ni espacios (p. ej. `"1234"`)
   - `enroll_rejected` — CFE rechazó el enrolamiento sin causa clasificable (el mensaje trae el texto de CFE si lo hubo)
 - `401`:
   - `invalid_api_key` — API key faltante o inválida

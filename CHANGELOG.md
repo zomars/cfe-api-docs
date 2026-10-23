@@ -2,6 +2,12 @@
 
 Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
+## 2026-10-22
+
+### Cambiado
+- **Nuevo código `400 service_cancelled`.** Cuando CFE responde que el servicio está dado de baja ("Su servicio se encuentra dado de baja."), la API devuelve este código en lugar del genérico `enroll_rejected`. Ese RPU ya no tiene contrato vigente. No se cobra.
+- **Nuevo código `400 total_format`.** Cuando CFE rechaza el formato de `total_a_pagar` ("El formato de total a pagar es incorrecto"), la API devuelve este código en lugar de `enroll_rejected`. Envía `total_a_pagar` como entero sin decimales, sin `$`, comas ni espacios (p. ej. `"1234"`). No se cobra.
+
 ## 2026-10-14
 
 ### Cambiado
