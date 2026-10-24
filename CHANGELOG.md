@@ -2,6 +2,12 @@
 
 Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
+## 2026-10-24
+
+### Cambiado
+- **`total_a_pagar` acepta también el total del penúltimo recibo**, no solo el del actual. Sigue siendo un entero sin decimales.
+- **El mensaje de `400 total_a_pagar_required` ahora explica la causa.** Dice que CFE retiró la consulta anónima por RPU + nombre, qué total enviar y enlaza a este CHANGELOG. El `code` no cambia ([#6](https://github.com/zomars/cfe-api-docs/issues/6)).
+
 ## 2026-10-22
 
 ### Cambiado
