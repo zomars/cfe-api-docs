@@ -5,8 +5,8 @@ Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 ## 2026-10-24
 
 ### Cambiado
-- **`total_a_pagar` acepta también el total del penúltimo recibo**, no solo el del actual. Sigue siendo un entero sin decimales.
-- **El mensaje de `400 total_a_pagar_required` ahora explica la causa.** Dice que CFE retiró la consulta anónima por RPU + nombre, qué total enviar y enlaza a este CHANGELOG. El `code` no cambia ([#6](https://github.com/zomars/cfe-api-docs/issues/6)).
+- **Qué total enviar en `total_a_pagar`.** CFE valida el total **del periodo facturado**, que es el `Total` del CFDI, del recibo actual o del penúltimo. Si el recibo trae adeudo anterior o un pago parcial, el "TOTAL A PAGAR" impreso no coincide y la respuesta es `total_mismatch`. Sigue siendo un entero sin decimales.
+- **Mensajes de error más útiles.** `400 total_a_pagar_required` ahora explica que CFE retiró la consulta anónima por RPU + nombre, qué total enviar y enlaza a este CHANGELOG ([#6](https://github.com/zomars/cfe-api-docs/issues/6)). `400 total_mismatch` agrega al texto de CFE la indicación sobre recibos con adeudo. Los `code` no cambian.
 
 ## 2026-10-22
 
