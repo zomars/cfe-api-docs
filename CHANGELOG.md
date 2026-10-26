@@ -2,6 +2,11 @@
 
 Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
+## 2026-10-25
+
+### Corregido
+- **`annual_kwh` ahora cubre 12 meses.** Antes sumaba todo el `historial` (hasta ~2 años) y en tarifas bimestrales dejaba fuera el periodo actual, así que el valor salía casi al doble. Ahora suma los últimos 12 meses contando el periodo del recibo consultado. Las respuestas ya en caché conservan el valor anterior hasta que expiran.
+
 ## 2026-10-24
 
 ### Cambiado
