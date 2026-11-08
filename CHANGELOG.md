@@ -2,6 +2,14 @@
 
 Cambios visibles para consumidores de la CFE API. Fechas en horario de México.
 
+## 2026-11-07
+
+### Corregido
+- **502 `unavailable` en RPUs que ya habían funcionado.** CFE admite cada servicio en una sola cuenta de MiCFE: si el titular u otra persona lo registra en la suya, CFE lo saca de la nuestra sin avisar. Desde el 4 de noviembre, las consultas de esos RPUs respondían `502 unavailable` en pocos segundos, incluso con un `periodo` inexistente, porque la API seguía tratando el servicio como enrolado. Ahora la consulta detecta que el servicio ya no está y lo vuelve a enrolar con el `total_a_pagar` que envíes. No se cobraron los 502.
+
+### Cambiado
+- **Nuevo código `400 enroll_no_response`.** Con algunos RPUs, CFE tarda alrededor de un minuto en responder el alta y regresa el formulario sin agregar el servicio ni dar motivo. Siempre les pasa a los mismos RPU. Antes salía como `502 unavailable` ("intenta de nuevo en unos minutos"), aunque reintentar no servía. La API ahora espera esa respuesta de CFE (la llamada tarda ~1 minuto) y devuelve este código. Verifica RPU, nombre y total contra el recibo vigente; si persiste, escríbenos con el `request_id`. No se cobra.
+
 ## 2026-10-25
 
 ### Corregido
